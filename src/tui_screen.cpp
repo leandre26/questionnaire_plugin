@@ -98,13 +98,12 @@ void TuiScreen::prepare_tui(ScreenInteractive &screen) {
   auto b_quit =
       Button("Quit", screen.ExitLoopClosure()) | color(Color::Orange1) | center;
 
-  bool running = false;
   auto b_mkin = Button("Mark In", [&] { 
-    running = true;
+    _running = true;
     _data["event"] = "marker in";
     _has_new_output = true;
   }) | color(Color::Blue1) | flex;
-  b_mkin = Maybe(b_mkin, [&running] { return !running; });
+  b_mkin = Maybe(b_mkin, [&] { return !_running; });
 
   auto b_mk = Button("Mark", [&] {
     _has_new_output = true;
@@ -112,13 +111,13 @@ void TuiScreen::prepare_tui(ScreenInteractive &screen) {
   }) | color(Color::Green) | flex;
 
   auto b_mkout = Button("Mark out", [&] {
-    running = false;
+    _running = false;
     _data["event"] = "marker out";
     uint32_t n = atoi(_trial_number.c_str());
     _trial_number = std::to_string(n + 1);
     _has_new_output = true;
   }) | color(Color::Yellow) | flex;
-  b_mkout = Maybe(b_mkout, [&running] { return running; });
+  b_mkout = Maybe(b_mkout, [&] { return _running; });
 
   auto b_stop = Button("Stop", [&] {
     _data["event"] = "stop";

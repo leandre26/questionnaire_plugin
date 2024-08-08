@@ -54,6 +54,7 @@ class TuiScreen {
 
   private:
   bool _has_new_output = false;
+  bool _running = false;
   std::vector<std::string> _toggle_labels = {"Enabled", "Disabled"};
   json _settings = json::parse("{}");
   json _data;
