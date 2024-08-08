@@ -107,7 +107,7 @@ using namespace ftxui;
 
 int main(int argc, char const *argv[]) {
   TuiPlugin plugin;
-  json output, params;
+  json output = json(), params = json();
 
   // Set example values to params
   params["test"] = "value";
