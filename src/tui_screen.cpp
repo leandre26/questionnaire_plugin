@@ -6,7 +6,11 @@ TuiScreen::TuiScreen(int width) : _header_width(width) {}
 TuiScreen::~TuiScreen() { save_settings(); }
 
 bool TuiScreen::reset_field(Event e, std::string &field) {
+#ifdef _WIN32
+  if (e == Event::Delete) {
+#else
   if (e == Event::CtrlK) {
+#endif
     field = "";
     return true;
   }
@@ -64,8 +68,9 @@ void TuiScreen::prepare_tui(ScreenInteractive &screen) {
 
   // -- Toggle------------------------------------------------------------------
   _toggle_selected = 0;
+  std::vector<std::string> toggle_options = {"Enabled", "Disabled"};
   auto logging =
-      Toggle(ConstStringListRef({"Enabled", "Disabled"}), &_toggle_selected);
+      Toggle(&toggle_options, &_toggle_selected);
   auto b_logging = Button("Logging", [&] {
     if (_toggle_selected == 0){
       _data["event"] = "logging ON";
