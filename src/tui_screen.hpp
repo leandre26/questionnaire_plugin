@@ -31,15 +31,30 @@ class TuiScreen {
   void load_settings(std::string filename = SETTINGS_FILENAME);
   void save_settings();
 
+  bool has_data() { 
+    if (_has_new_output) {
+      _has_new_output = false;
+      return true;
+    } else {
+      return false;
+    }
+  }
+
+  void update_settings();
+  json get_data();
+
   private:
   bool reset_field(Event e, std::string &field);
   Component Wrap(std::string name, Component component);
 
   public:
   Component component;
+  bool exit_requested = false;
 
   private:
+  bool _has_new_output = false;
   json _settings = json::parse("{}");
+  json _data;
   std::string _settings_filename = SETTINGS_FILENAME;
   int _header_width = 18;
   std::string _machine_operator = "";

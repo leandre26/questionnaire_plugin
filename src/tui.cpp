@@ -19,7 +19,10 @@
 // other includes as needed here
 #include <ftxui/screen/screen.hpp>
 #include <ftxui/component/component.hpp>
+#include "ftxui/component/loop.hpp"
 #include <thread>
+
+#include "tui_screen.hpp"
 
 
 // Define the name of the plugin
@@ -39,47 +42,42 @@ class TuiPlugin : public Source<json> {
 
 public:
 
-  // Typically, no need to change this
   string kind() override { return PLUGIN_NAME; }
 
-  // Implement the actual functionality here
   return_type get_output(json &out,
                          std::vector<unsigned char> *blob = nullptr) override {
     out.clear();
-
-    // load the data as necessary and set the fields of the json out variable
-
-    // This sets the agent_id field in the output json object, only when it is
-    // not empty
     if (!_agent_id.empty()) out["agent_id"] = _agent_id;
-    return return_type::success;
+    _loop->RunOnce();
+    if (_loop->HasQuitted()) {
+      out["exit_requested"] = true;
+      return return_type::critical;
+    }
+    if (_tui_screen.has_data()) {
+      out = _tui_screen.get_data();
+      return return_type::success;
+    }
+    return return_type::retry;
   }
 
   void set_params(void const *params) override {
-    // Call the parent class method to set the common parameters 
-    // (e.g. agent_id, etc.)
     Source::set_params(params);
-
-    // provide sensible defaults for the parameters by setting e.g.
-    _params["some_field"] = "default_value";
-    // more here...
-
-    // then merge the defaults with the actually provided parameters
-    // params needs to be cast to json
     _params.merge_patch(*(json *)params);
+    
+    _tui_screen.load_settings();
+    _tui_screen.prepare_tui(_screen);
+    _loop = unique_ptr<Loop>(new Loop(&_screen, _tui_screen.component));
   }
 
-  // Implement this method if you want to provide additional information
   map<string, string> info() override { 
-    // return a map of stringswith additional information about the plugin
-    // it is used to print the information about the plugin when it is loaded
-    // by the agent
     return {}; 
   };
 
 private:
+  TuiScreen _tui_screen{18};
   // Define the fields that are used to store internal resources
-
+  ScreenInteractive _screen = ScreenInteractive::Fullscreen();
+  unique_ptr<Loop> _loop;
 };
 
 
@@ -117,23 +115,14 @@ int main(int argc, char const *argv[]) {
   // Set the parameters
   plugin.set_params(&params);
 
-  auto screen = Screen::Create(Dimension::Full(), Dimension::Fixed(15));
-  Element document = vbox({
-    text("Hello, World!") | bold | color(Color::Yellow),
-    gauge(0.5) | color(Color::Green),
-    text("Press any key to quit."),
-  });
-  document |= border;
-
-  Render(screen, document);
-
-
-  cout << screen.ToString() << endl;
   // Process data
   while(true) {
     // Get the output
-    plugin.get_output(output);
-    this_thread::sleep_for(1s);
+    auto rt = plugin.get_output(output);
+    if (rt == return_type::critical) break;
+    if (rt == return_type::success) 
+      cout << output.dump() << endl;
+    this_thread::sleep_for(10ms);
   }
 
   // Produce output

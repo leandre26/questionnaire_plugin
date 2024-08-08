@@ -66,7 +66,16 @@ void TuiScreen::prepare_tui(ScreenInteractive &screen) {
   _toggle_selected = 0;
   auto logging =
       Toggle(ConstStringListRef({"Enabled", "Disabled"}), &_toggle_selected);
-  auto b_logging = Button("Logging", [] {});
+  auto b_logging = Button("Logging", [&] {
+    if (_toggle_selected == 0){
+      _data["event"] = "logging ON";
+      _data["pause"] = false;
+    } else {
+      _data["event"] = "logging Off";
+      _data["pause"] = true;
+    } 
+    _has_new_output = true;
+  });
 
   // -- Checkbox ---------------------------------------------------------------
   _test_selected = _settings.value("test_selected", false);
@@ -87,24 +96,36 @@ void TuiScreen::prepare_tui(ScreenInteractive &screen) {
       Button("Quit", screen.ExitLoopClosure()) | color(Color::Orange1) | center;
 
   bool running = false;
-  auto b_mkin = Button("Mark In", [&running] { running = true; }) |
-                color(Color::Blue1) | flex;
+  auto b_mkin = Button("Mark In", [&] { 
+    running = true;
+    _data["event"] = "marker in";
+    _has_new_output = true;
+  }) | color(Color::Blue1) | flex;
   b_mkin = Maybe(b_mkin, [&running] { return !running; });
 
-  auto b_mk = Button("Mark", [] {}) | color(Color::Green) | flex;
+  auto b_mk = Button("Mark", [&] {
+    _has_new_output = true;
+    _data["event"] = "marker";
+  }) | color(Color::Green) | flex;
 
-  auto b_mkout = Button("Mark out",
-                        [&] {
-                          running = false;
-                          uint32_t n = atoi(_trial_number.c_str());
-                          _trial_number = std::to_string(n + 1);
-                        }) |
-                 color(Color::Yellow) | flex;
+  auto b_mkout = Button("Mark out", [&] {
+    running = false;
+    _data["event"] = "marker out";
+    uint32_t n = atoi(_trial_number.c_str());
+    _trial_number = std::to_string(n + 1);
+    _has_new_output = true;
+  }) | color(Color::Yellow) | flex;
   b_mkout = Maybe(b_mkout, [&running] { return running; });
 
-  auto b_stop = Button("Stop", [] {}) | color(Color::Red) | flex;
+  auto b_stop = Button("Stop", [&] {
+    _data["event"] = "stop";
+    _has_new_output = true;
+  }) | color(Color::Red) | flex;
 
-  auto b_restart = Button("Restart", [] {}) | color(Color::Purple) | flex;
+  auto b_restart = Button("Restart", [&] {
+    _data["event"] = "restart";
+    _has_new_output = true;
+  }) | color(Color::Purple) | flex;
 
   // -- Layout -----------------------------------------------------------------
   auto layout = Container::Vertical(
@@ -151,15 +172,25 @@ void TuiScreen::load_settings(std::string filename) {
 }
 
 void TuiScreen::save_settings() {
-  _settings = {
-      {"operator", _machine_operator}, {"user", _mads_user},
-      {"operation", _operation},       {"trial_number", _trial_number},
-      {"comment", _comment},           {"test_selected", _test_selected},
-      {"cn1_selected", _cn1_selected}, {"cn2_selected", _cn2_selected},
-      {"cn3_selected", _cn3_selected}};
+  get_data();
   std::ofstream file(_settings_filename);
   if (file.is_open()) {
     file << _settings.dump(2);
     file.close();
   }
+}
+
+void TuiScreen::update_settings() {
+  _settings = {
+        {"operator", _machine_operator}, {"user", _mads_user},
+        {"operation", _operation},       {"trial_number", _trial_number},
+        {"comment", _comment},           {"test_selected", _test_selected},
+        {"cn1_selected", _cn1_selected}, {"cn2_selected", _cn2_selected},
+        {"cn3_selected", _cn3_selected}};
+}
+
+json TuiScreen::get_data() {
+  update_settings();
+  _data["info"] = _settings;
+  return _data;
 }
