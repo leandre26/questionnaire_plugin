@@ -14,7 +14,7 @@ bool TuiScreen::reset_field(Event e, std::string &field) {
 }
 
 Component TuiScreen::Wrap(std::string name, Component component) {
-  return Renderer(component, [&] {
+  return Renderer(component, [=] {
     return hbox({
                text(name) | size(WIDTH, EQUAL, _header_width),
                separator(),
@@ -67,9 +67,8 @@ void TuiScreen::prepare_tui(ScreenInteractive &screen) {
 
   // -- Toggle------------------------------------------------------------------
   _toggle_selected = 0;
-  std::vector<std::string> toggle_options = {"Enabled", "Disabled"};
-  auto logging =
-      Toggle(&toggle_options, &_toggle_selected);
+
+  auto logging = Toggle(&_toggle_labels, &_toggle_selected);
   auto b_logging = Button("Logging", [&] {
     if (_toggle_selected == 0){
       _data["event"] = "logging ON";
@@ -148,7 +147,7 @@ void TuiScreen::prepare_tui(ScreenInteractive &screen) {
     b_quit
   });
 
-  component = Renderer(layout, [&] {
+  component = Renderer(layout, [=] {
     return vbox({
       input_operator->Render(),
       input_user->Render(),
@@ -179,6 +178,7 @@ void TuiScreen::prepare_tui(ScreenInteractive &screen) {
   });
   // clang-format on
 }
+
 
 void TuiScreen::load_settings(std::string filename) {
   _settings_filename = filename;

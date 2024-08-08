@@ -27,6 +27,7 @@ class TuiScreen {
   TuiScreen(int width = 18);
   ~TuiScreen();
   void prepare_tui(ScreenInteractive &screen);
+  void prepare_tui_simple(ScreenInteractive &screen);
   
   void load_settings(std::string filename = SETTINGS_FILENAME);
   void save_settings();
@@ -53,6 +54,7 @@ class TuiScreen {
 
   private:
   bool _has_new_output = false;
+  std::vector<std::string> _toggle_labels = {"Enabled", "Disabled"};
   json _settings = json::parse("{}");
   json _data;
   std::string _settings_filename = SETTINGS_FILENAME;
