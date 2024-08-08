@@ -17,6 +17,10 @@
 #include <nlohmann/json.hpp>
 #include <pugg/Kernel.h>
 // other includes as needed here
+#include <ftxui/screen/screen.hpp>
+#include <ftxui/component/component.hpp>
+#include <thread>
+
 
 // Define the name of the plugin
 #ifndef PLUGIN_NAME
@@ -26,6 +30,7 @@
 // Load the namespaces
 using namespace std;
 using json = nlohmann::json;
+using namespace chrono_literals;
 
 
 // Plugin class. This shall be the only part that needs to be modified,
@@ -99,6 +104,9 @@ INSTALL_SOURCE_DRIVER(TuiPlugin, json)
 
 For testing purposes, when directly executing the plugin
 */
+
+using namespace ftxui;
+
 int main(int argc, char const *argv[]) {
   TuiPlugin plugin;
   json output, params;
@@ -109,8 +117,24 @@ int main(int argc, char const *argv[]) {
   // Set the parameters
   plugin.set_params(&params);
 
+  auto screen = Screen::Create(Dimension::Full(), Dimension::Fixed(15));
+  Element document = vbox({
+    text("Hello, World!") | bold | color(Color::Yellow),
+    gauge(0.5) | color(Color::Green),
+    text("Press any key to quit."),
+  });
+  document |= border;
+
+  Render(screen, document);
+
+
+  cout << screen.ToString() << endl;
   // Process data
-  plugin.get_output(output);
+  while(true) {
+    // Get the output
+    plugin.get_output(output);
+    this_thread::sleep_for(1s);
+  }
 
   // Produce output
   cout << "Output: " << output << endl;

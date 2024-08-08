@@ -54,12 +54,14 @@ FetchContent_Declare(plugin
 )
 
 FetchContent_Declare(ftxui
-  GIT_REPOSITORY = https://github.com/ArthurSonzogni/FTXUI.git
-  GIT_TAG        = v5.0.0
-  GIT_SHALLOW    = TRUE
+  GIT_REPOSITORY https://github.com/ArthurSonzogni/ftxui
+  GIT_TAG v5.0.0
+  GIT_SHALLOW TRUE
 )
-FetchContent_MakeAvailable(pugg json ftxui)
+FetchContent_MakeAvailable(pugg json)
 FetchContent_Populate(plugin)
+set(FETCHCONTENT_UPDATES_DISCONNECTED TRUE)
+FetchContent_MakeAvailable(ftxui)
 
 include_directories(${plugin_SOURCE_DIR}/src)
 
@@ -101,9 +103,10 @@ else()
 endif()
 include_directories(${json_SOURCE_DIR}/include)
 
-# These plugins are always build and use for testing
-add_plugin(tui)
 
+add_plugin(tui LIBS ftxui::screen ftxui::dom ftxui::component)
+add_executable(example ${SRC_DIR}/example.cpp ${SRC_DIR}/tui_screen.cpp)
+target_link_libraries(example PRIVATE ftxui::screen ftxui::dom ftxui::component)
 
 # INSTALL ######################################################################
 if(CMAKE_INSTALL_PREFIX_INITIALIZED_TO_DEFAULT)
