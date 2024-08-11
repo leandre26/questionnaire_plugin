@@ -6,7 +6,7 @@ TuiScreen::TuiScreen(int width) : _header_width(width) {}
 TuiScreen::~TuiScreen() { save_settings(); }
 
 bool TuiScreen::reset_field(Event e, std::string &field) {
-  if (e == Event::Delete) {
+  if (e == Event::F10 || e == Event::Delete) {
     field = "";
     return true;
   }
