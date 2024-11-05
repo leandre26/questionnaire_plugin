@@ -47,21 +47,21 @@ FetchContent_Declare(json
   GIT_SHALLOW    TRUE
 )
 
-FetchContent_Declare(plugin 
-  GIT_REPOSITORY https://github.com/pbosetti/mads_plugin.git
-  GIT_TAG        HEAD
-  GIT_SHALLOW    TRUE
-)
-
 FetchContent_Declare(ftxui
   GIT_REPOSITORY https://github.com/ArthurSonzogni/ftxui
   GIT_TAG HEAD
   GIT_SHALLOW TRUE
 )
-FetchContent_MakeAvailable(pugg json)
-FetchContent_Populate(plugin)
+
 set(FETCHCONTENT_UPDATES_DISCONNECTED TRUE)
-FetchContent_MakeAvailable(ftxui)
+FetchContent_MakeAvailable(pugg json ftxui)
+
+FetchContent_Populate(plugin 
+  GIT_REPOSITORY https://github.com/pbosetti/mads_plugin.git
+  GIT_TAG        HEAD
+  GIT_SHALLOW    TRUE
+)
+
 
 include_directories(${plugin_SOURCE_DIR}/src)
 
