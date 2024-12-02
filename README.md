@@ -36,9 +36,12 @@ cmake --install build --config Release
 
 ## A note on the agent name/PUB topic
 
-The plugin uses the agent name as the PUB topic. This means that the default PUB topic is going to be `tui`. Since the logger agent is expecting to receive commands on the `metadata` topic, you need to change name of the tui plugin agent to `metadata` either in the INI file (bu setting `pub_topic = "metadata"`, see the next section) or on the command line (by using the `-n metadata` option).
+All plugins use their own name (without the `.plugin` extension) as the PUB topic. This means that the default PUB topic for `tui.plugin` is going to be `tui`. Since the logger agent is expecting to receive commands on the `metadata` topic, **you need to change name** of the tui plugin agent to `metadata`; you can do that in two ways:
 
-The first is the recommended way, as it allows to keep the agent name in the INI file and avoid having to remember to pass the `-n` option every time you run the plugin.
+* by setting `pub_topic = "metadata"` in the `[tui]` section of the ` mads.ini` file, see the next section;
+* or on the command line, by using the `-n metadata` option.
+
+The first is the recommended way, as it allows to keep the agent name in the `mads.ini` file and avoid having to remember to pass the `-n` option every time you run the plugin.
 
 
 ## INI settings
