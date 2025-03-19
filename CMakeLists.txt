@@ -11,7 +11,7 @@
 # Creation date: 2024-08-07T13:56:04.950+0200
 # NOTICE: MADS Version 1.0.2
 cmake_minimum_required(VERSION 3.20)
-project(tui VERSION 1.0.2 LANGUAGES CXX)
+project(questionnaire VERSION 1.0.2 LANGUAGES CXX)
 if(CMAKE_BUILD_TYPE STREQUAL "")
   set(CMAKE_BUILD_TYPE "Release" CACHE STRING "Choose the type of build." FORCE)
 endif()
