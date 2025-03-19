@@ -104,11 +104,13 @@ endif()
 include_directories(${json_SOURCE_DIR}/include)
 
 
-add_plugin(tui 
-  SRCS ${SRC_DIR}/tui_screen.cpp
+add_plugin(questionnaire 
+  SRCS ${SRC_DIR}/questionnaire_screen.cpp
   LIBS ftxui::screen ftxui::component
 )
-add_executable(example ${SRC_DIR}/example.cpp ${SRC_DIR}/tui_screen.cpp)
+
+# Example executable
+add_executable(example ${SRC_DIR}/example.cpp ${SRC_DIR}/questionnaire_screen.cpp)
 target_link_libraries(example PRIVATE ftxui::screen ftxui::dom ftxui::component)
 
 # INSTALL ######################################################################
