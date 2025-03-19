@@ -16,36 +16,26 @@
 #include <source.hpp>
 #include <nlohmann/json.hpp>
 #include <pugg/Kernel.h>
-// other includes as needed here
 #include <ftxui/screen/screen.hpp>
 #include <ftxui/component/component.hpp>
 #include "ftxui/component/loop.hpp"
 #include <thread>
+#include "questionnaire_screen.hpp"
 
-#include "tui_screen.hpp"
-
-
-// Define the name of the plugin
 #ifndef PLUGIN_NAME
-#define PLUGIN_NAME "tui"
+#define PLUGIN_NAME "questionnaire"
 #endif
 
-// Load the namespaces
 using namespace std;
 using json = nlohmann::json;
 using namespace chrono_literals;
+using namespace ftxui;
 
-
-// Plugin class. This shall be the only part that needs to be modified,
-// implementing the actual functionality
-class TuiPlugin : public Source<json> {
-
+class QuestionnairePlugin : public Source<json> {
 public:
-
   string kind() override { return PLUGIN_NAME; }
 
-  return_type get_output(json &out,
-                         std::vector<unsigned char> *blob = nullptr) override {
+  return_type get_output(json &out, std::vector<unsigned char> *blob = nullptr) override {
     out.clear();
     if (!_agent_id.empty()) out["agent_id"] = _agent_id;
     _loop->RunOnce();
@@ -53,8 +43,8 @@ public:
       out["exit_requested"] = true;
       return return_type::critical;
     }
-    if (_tui_screen.has_data()) {
-      out = _tui_screen.get_data();
+    if (_questionnaire_screen.has_data()) {
+      out = _questionnaire_screen.get_data();
       return return_type::success;
     }
     return return_type::retry;
@@ -63,23 +53,20 @@ public:
   void set_params(void const *params) override {
     Source::set_params(params);
     _params.merge_patch(*(json *)params);
-    
-    _tui_screen.load_settings();
-    _tui_screen.prepare_tui(_screen);
-    _loop = unique_ptr<Loop>(new Loop(&_screen, _tui_screen.component));
+    _questionnaire_screen.load_settings();
+    _questionnaire_screen.prepare_questionnaire(_screen);
+    _loop = unique_ptr<Loop>(new Loop(&_screen, _questionnaire_screen.component));
   }
 
-  map<string, string> info() override { 
-    return {}; 
+  map<string, string> info() override {
+    return {};
   };
 
 private:
-  TuiScreen _tui_screen{18};
-  // Define the fields that are used to store internal resources
+  QuestionnaireScreen _questionnaire_screen{18};
   ScreenInteractive _screen = ScreenInteractive::Fullscreen();
   unique_ptr<Loop> _loop;
 };
-
 
 /*
   ____  _             _             _      _
@@ -90,7 +77,7 @@ private:
                 |___/
 Enable the class as plugin
 */
-INSTALL_SOURCE_DRIVER(TuiPlugin, json)
+INSTALL_SOURCE_DRIVER(QuestionnairePlugin, json)
 
 
 /*
@@ -103,30 +90,35 @@ INSTALL_SOURCE_DRIVER(TuiPlugin, json)
 For testing purposes, when directly executing the plugin
 */
 
-using namespace ftxui;
-
 int main(int argc, char const *argv[]) {
-  TuiPlugin plugin;
-  json output = json(), params = json();
+  string nom;
+  string date;
+  int pression = 0;
+  int machine_index = 0;
+  vector<string> machines = {"VX1", "VX2", "VX3", "VX4"};
 
-  // Set example values to params
-  params["test"] = "value";
+  auto nom_input = Input(&nom, "Nom");
+  auto date_input = Input(&date, "JJ/MM/AAAA");
+  auto pression_input = Input(&pression, "Pression (bar)");
+  auto machine_select = Radiobox(&machines, &machine_index);
 
-  // Set the parameters
-  plugin.set_params(&params);
+  auto component = Container::Vertical({
+    nom_input,
+    date_input,
+    machine_select,
+    pression_input,
+    Button("Valider", [] { ScreenInteractive::ExitLoopClosure()(); })
+  });
 
-  // Process data
-  while(true) {
-    // Get the output
-    auto rt = plugin.get_output(output);
-    if (rt == return_type::critical) break;
-    if (rt == return_type::success) 
-      cout << output.dump() << endl;
-    this_thread::sleep_for(10ms);
-  }
+  ScreenInteractive screen = ScreenInteractive::Fullscreen();
+  screen.Loop(component);
 
-  // Produce output
-  cout << "Output: " << output << endl;
+  json output;
+  output["nom"] = nom;
+  output["date"] = date;
+  output["machine"] = machines[machine_index];
+  output["pression"] = pression;
+  cout << "Output: " << output.dump() << endl;
 
   return 0;
 }
