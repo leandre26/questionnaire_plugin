@@ -93,13 +93,13 @@ For testing purposes, when directly executing the plugin
 int main(int argc, char const *argv[]) {
   string nom;
   string date;
-  int pression = 0;
+  std::string pression_str = std::to_string(pression);
   int machine_index = 0;
   vector<string> machines = {"VX1", "VX2", "VX3", "VX4"};
 
   auto nom_input = Input(&nom, "Nom");
   auto date_input = Input(&date, "JJ/MM/AAAA");
-  auto pression_input = Input(&pression, "Pression (bar)");
+  auto pression_input = Input(&pression_str, "Pression (bar)");
   auto machine_select = Radiobox(&machines, &machine_index);
 
   auto component = Container::Vertical({
