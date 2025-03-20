@@ -1,5 +1,9 @@
 #include "questionnaire_screen.hpp"
 #include <iostream>
+#include <fstream>
+#include <nlohmann/json.hpp>
+
+using json = nlohmann::json;
 
 QuestionnaireScreen::QuestionnaireScreen(int width) : _header_width(width), _pression_hydrolique(0.0), _pression_broche_air(0.0), _temperature_bloc_froid(0.0) {}
 
@@ -58,6 +62,13 @@ void QuestionnaireScreen::prepare_questionnaire(ScreenInteractive &screen) {
   });
   input_pression_broche_air = Wrap("Pression Broche Air", input_pression_broche_air);
 
+  _temperature_bloc_froid_str = std::to_string(_temperature_bloc_froid);
+  auto input_temperature_bloc_froid = Input(&_temperature_bloc_froid_str, "Température Bloc Froid (°C)");
+  input_temperature_bloc_froid = CatchEvent(input_temperature_bloc_froid, [&](Event e) {
+    return e.is_character() && !isdigit(e.character()[0]) && e.character()[0] != '.';
+  });
+  input_temperature_bloc_froid = Wrap("Température Bloc Froid", input_temperature_bloc_froid);
+
   auto huile_broche_select = Radiobox(&_niveau_options, &_huile_broche_index);
   huile_broche_select = Wrap("Niveau Huile Broche", huile_broche_select);
 
@@ -69,13 +80,6 @@ void QuestionnaireScreen::prepare_questionnaire(ScreenInteractive &screen) {
 
   auto bac_copeaux_select = Radiobox(&_niveau_options, &_bac_copeaux_index);
   bac_copeaux_select = Wrap("Niveau Bac Copeaux", bac_copeaux_select);
-
-  _temperature_bloc_froid_str = std::to_string(_temperature_bloc_froid);
-  auto input_temperature_bloc_froid = Input(&_temperature_bloc_froid_str, "Température Bloc Froid (°C)");
-  input_temperature_bloc_froid = CatchEvent(input_temperature_bloc_froid, [&](Event e) {
-    return e.is_character() && !isdigit(e.character()[0]) && e.character()[0] != '.';
-  });
-  input_temperature_bloc_froid = Wrap("Température Bloc Froid", input_temperature_bloc_froid);
 
   auto proprete_usinage_select = Radiobox(&_proprete_options, &_proprete_usinage_index);
   proprete_usinage_select = Wrap("Propreté Zone Usinage", proprete_usinage_select);
@@ -96,11 +100,11 @@ void QuestionnaireScreen::prepare_questionnaire(ScreenInteractive &screen) {
     machine_select,
     input_pression_hydrolique,
     input_pression_broche_air,
+    input_temperature_bloc_froid,
     huile_broche_select,
     huile_glissieres_select,
     lubrifiant_select,
     bac_copeaux_select,
-    input_temperature_bloc_froid,
     proprete_usinage_select,
     proprete_machine_select,
     input_observation,
@@ -116,11 +120,11 @@ void QuestionnaireScreen::prepare_questionnaire(ScreenInteractive &screen) {
       machine_select->Render(),
       input_pression_hydrolique->Render(),
       input_pression_broche_air->Render(),
+      input_temperature_bloc_froid->Render(),
       huile_broche_select->Render(),
       huile_glissieres_select->Render(),
       lubrifiant_select->Render(),
       bac_copeaux_select->Render(),
-      input_temperature_bloc_froid->Render(),
       proprete_usinage_select->Render(),
       proprete_machine_select->Render(),
       input_observation->Render(),
@@ -128,4 +132,24 @@ void QuestionnaireScreen::prepare_questionnaire(ScreenInteractive &screen) {
       b_validate->Render()
     }) | xflex | border;
   });
+}
+
+json QuestionnaireScreen::get_data() {
+  json data;
+  data["Nom"] = _nom;
+  data["Groupe"] = _groupe;
+  data["Date"] = _date;
+  data["Zone"] = _zones[_zone_index];
+  data["Machine"] = _machines[_machine_index];
+  data["Pression Hydrolique"] = _pression_hydrolique;
+  data["Pression Broche Air"] = _pression_broche_air;
+  data["Température Bloc Froid"] = _temperature_bloc_froid;
+  data["Niveau Huile Broche"] = _niveau_options[_huile_broche_index];
+  data["Niveau Huile Glissieres"] = _niveau_options[_huile_glissieres_index];
+  data["Niveau Lubrifiant"] = _niveau_options[_lubrifiant_index];
+  data["Niveau Bac Copeaux"] = _niveau_options[_bac_copeaux_index];
+  data["Propreté Zone Usinage"] = _proprete_options[_proprete_usinage_index];
+  data["Propreté Machine"] = _proprete_options[_proprete_machine_index];
+  data["Observation"] = _observation;
+  return data;
 }
