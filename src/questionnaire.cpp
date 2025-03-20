@@ -93,6 +93,7 @@ For testing purposes, when directly executing the plugin
 int main(int argc, char const *argv[]) {
   string nom;
   string date;
+  int pression = 0; 
   std::string pression_str = std::to_string(pression);
   int machine_index = 0;
   vector<string> machines = {"VX1", "VX2", "VX3", "VX4"};
@@ -102,16 +103,18 @@ int main(int argc, char const *argv[]) {
   auto pression_input = Input(&pression_str, "Pression (bar)");
   auto machine_select = Radiobox(&machines, &machine_index);
 
+  ScreenInteractive screen = ScreenInteractive::Fullscreen();
   auto component = Container::Vertical({
     nom_input,
     date_input,
     machine_select,
     pression_input,
-    Button("Valider", [] { ScreenInteractive::ExitLoopClosure()(); })
+    Button("Valider", screen.ExitLoopClosure()) 
   });
 
-  ScreenInteractive screen = ScreenInteractive::Fullscreen();
   screen.Loop(component);
+
+  pression = std::stoi(pression_str); 
 
   json output;
   output["nom"] = nom;
