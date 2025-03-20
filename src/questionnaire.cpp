@@ -91,37 +91,15 @@ For testing purposes, when directly executing the plugin
 */
 
 int main(int argc, char const *argv[]) {
-  string nom;
-  string date;
-  int pression = 0; 
-  std::string pression_str = std::to_string(pression);
-  int machine_index = 0;
-  vector<string> machines = {"VX1", "VX2", "VX3", "VX4"};
-
-  auto nom_input = Input(&nom, "Nom");
-  auto date_input = Input(&date, "JJ/MM/AAAA");
-  auto pression_input = Input(&pression_str, "Pression (bar)");
-  auto machine_select = Radiobox(&machines, &machine_index);
-
   ScreenInteractive screen = ScreenInteractive::Fullscreen();
-  auto component = Container::Vertical({
-    nom_input,
-    date_input,
-    machine_select,
-    pression_input,
-    Button("Valider", screen.ExitLoopClosure()) 
-  });
+  QuestionnaireScreen questionnaire_screen(18);
+  questionnaire_screen.prepare_questionnaire(screen);
 
-  screen.Loop(component);
+  screen.Loop(questionnaire_screen.component);
 
-  pression = std::stoi(pression_str); 
-
-  json output;
-  output["nom"] = nom;
-  output["date"] = date;
-  output["machine"] = machines[machine_index];
-  output["pression"] = pression;
-  cout << "Output: " << output.dump() << endl;
+  json output = questionnaire_screen.get_data();
+  cout << "Output: " << output.dump(2) << endl;
 
   return 0;
 }
+
