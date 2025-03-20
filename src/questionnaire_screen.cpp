@@ -104,7 +104,6 @@ void QuestionnaireScreen::prepare_questionnaire(ScreenInteractive &screen) {
     proprete_usinage_select,
     proprete_machine_select,
     input_observation,
-    separator(),
     b_validate
   });
 
