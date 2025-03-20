@@ -46,7 +46,7 @@ void QuestionnaireScreen::prepare_questionnaire(ScreenInteractive &screen) {
 
   auto b_validate = Button("Valider", screen.ExitLoopClosure());
 
-  auto layout = Container::Vertical({
+  auto layout = Container::Vertical(Components{
     input_nom,
     input_date,
     machine_select,
