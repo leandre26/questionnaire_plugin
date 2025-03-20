@@ -49,7 +49,7 @@ FetchContent_Declare(json
 
 FetchContent_Declare(ftxui
   GIT_REPOSITORY https://github.com/ArthurSonzogni/ftxui
-  GIT_TAG HEAD
+  GIT_TAG v4.0.0
   GIT_SHALLOW TRUE
 )
 
