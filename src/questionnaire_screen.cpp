@@ -25,7 +25,7 @@ Component QuestionnaireScreen::Wrap(std::string name, Component component) {
 }
 
 void QuestionnaireScreen::prepare_questionnaire(ScreenInteractive &screen) {
-  auto input_nom = Input(&_nom, "Nom"); // Changed _name -> _nom
+  auto input_nom = Input(&_nom, "Nom");
   input_nom = CatchEvent(input_nom, [&](Event e) { return reset_field(e, _nom); });
   input_nom = Wrap("Nom", input_nom);
 
@@ -33,10 +33,10 @@ void QuestionnaireScreen::prepare_questionnaire(ScreenInteractive &screen) {
   input_date |= CatchEvent([&](Event e) { return reset_field(e, _date); });
   input_date = Wrap("Date", input_date);
 
-  _pression_str = std::to_string(_pression); // Convert int to string
-  auto input_pression = Input(&_pression_str, "Pression (bar)"); // Use string for Input
+  _pression_str = std::to_string(_pression); 
+  auto input_pression = Input(&_pression_str, "Pression (bar)"); 
   input_pression |= CatchEvent([&](Event e) {
-    return e.is_character() && !isdigit(e.character()[0]);
+    return e.is_character() && !isdigit(e.character()[0]) && e.character()[0] != '.';
   });
   input_pression = Wrap("Pression", input_pression);
 
@@ -76,7 +76,7 @@ void QuestionnaireScreen::load_settings(std::string filename) {
   }
   _nom = _settings.value("nom", "");
   _date = _settings.value("date", "");
-  _pression = std::stoi(_settings.value("pression", "0")); // Convert string to int
+  _pression_str = _settings.value("pression", "0");
 }
 
 void QuestionnaireScreen::save_settings() {
@@ -92,7 +92,7 @@ void QuestionnaireScreen::update_settings() {
   _settings = {
       {"nom", _nom},
       {"date", _date},
-      {"pression", std::to_string(_pression)}, // Store as string
+      {"pression", _pression_str},
       {"machine_index", _machine_index}
   };
 }
