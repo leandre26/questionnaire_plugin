@@ -55,6 +55,7 @@ private:
   std::string _nom = "";
   std::string _date = "";
   int _pression = 0;
+  std::string _pression_str = "0"; 
   int _machine_index = 0;
   std::vector<std::string> _machines = {"VX1", "VX2", "VX3", "VX4"};
 
