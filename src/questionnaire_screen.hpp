@@ -51,6 +51,9 @@ public:
 private:
   bool _has_new_output = false;
   int _header_width = 18;
+  double _pression_hydrolique = 0.0;
+  double _pression_broche_air = 0.0;
+  double _temperature_bloc_froid = 0.0;
 
   // Questionnaire fields
   std::string _nom = "";
