@@ -33,7 +33,8 @@ void QuestionnaireScreen::prepare_questionnaire(ScreenInteractive &screen) {
   input_date |= CatchEvent([&](Event e) { return reset_field(e, _date); });
   input_date = Wrap("Date", input_date);
 
-  auto input_pression = Input(&_pression, "Pression (bar)"); // Changed _pressure -> _pression
+  _pression_str = std::to_string(_pression); // Convert int to string
+  auto input_pression = Input(&_pression_str, "Pression (bar)"); // Use string for Input
   input_pression |= CatchEvent([&](Event e) {
     return e.is_character() && !isdigit(e.character()[0]);
   });
@@ -75,7 +76,7 @@ void QuestionnaireScreen::load_settings(std::string filename) {
   }
   _nom = _settings.value("nom", "");
   _date = _settings.value("date", "");
-  _pression = _settings.value("pression", 0);
+  _pression = std::stoi(_settings.value("pression", "0")); // Convert string to int
 }
 
 void QuestionnaireScreen::save_settings() {
@@ -91,7 +92,7 @@ void QuestionnaireScreen::update_settings() {
   _settings = {
       {"nom", _nom},
       {"date", _date},
-      {"pression", _pression},
+      {"pression", std::to_string(_pression)}, // Store as string
       {"machine_index", _machine_index}
   };
 }
