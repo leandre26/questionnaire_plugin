@@ -142,7 +142,7 @@ void QuestionnaireScreen::load_settings(std::string filename) {
     file.close();
   }
   _nom = _settings.value("nom", "");
-  _groupe = _setting.value("groupe","");
+  _groupe = _settings.value("groupe","");
   _date = _settings.value("date", "");
   _pression_hydrolique_str = _settings.value("pression hydrolique", "0");
   _pression_broche_air_str = _settings.value("pression broche air", "0");
