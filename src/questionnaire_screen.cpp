@@ -30,12 +30,12 @@ void QuestionnaireScreen::prepare_questionnaire(ScreenInteractive &screen) {
   input_nom = Wrap("Nom", input_nom);
 
   auto input_date = Input(&_date, "JJ/MM/AAAA");
-  input_date |= CatchEvent([&](Event e) { return reset_field(e, _date); });
+  input_date = CatchEvent(input_date, [&](Event e) { return reset_field(e, _date); });
   input_date = Wrap("Date", input_date);
 
-  _pression_str = std::to_string(_pression); 
-  auto input_pression = Input(&_pression_str, "Pression (bar)"); 
-  input_pression |= CatchEvent([&](Event e) {
+  _pression_str = std::to_string(_pression);
+  auto input_pression = Input(&_pression_str, "Pression (bar)");
+  input_pression = CatchEvent(input_pression, [&](Event e) {
     return e.is_character() && !isdigit(e.character()[0]) && e.character()[0] != '.';
   });
   input_pression = Wrap("Pression", input_pression);
@@ -46,12 +46,11 @@ void QuestionnaireScreen::prepare_questionnaire(ScreenInteractive &screen) {
 
   auto b_validate = Button("Valider", screen.ExitLoopClosure());
 
-  auto layout = Container::Vertical(Components{
+  auto layout = Container::Vertical({
     input_nom,
     input_date,
     machine_select,
     input_pression,
-    separator(),
     b_validate
   });
 
@@ -61,7 +60,7 @@ void QuestionnaireScreen::prepare_questionnaire(ScreenInteractive &screen) {
       input_date->Render(),
       machine_select->Render(),
       input_pression->Render(),
-      separator(),
+      separator(), 
       b_validate->Render()
     }) | xflex | border;
   });
