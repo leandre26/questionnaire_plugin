@@ -75,7 +75,7 @@ void QuestionnaireScreen::load_settings(std::string filename) {
   }
   _nom = _settings.value("nom", "");
   _date = _settings.value("date", "");
-  _pression = _settings.value("pression", "0");
+  _pression = _settings.value("pression", 0);
 }
 
 void QuestionnaireScreen::save_settings() {
