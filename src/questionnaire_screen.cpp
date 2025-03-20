@@ -1,7 +1,7 @@
 #include "questionnaire_screen.hpp"
 #include <iostream>
 
-QuestionnaireScreen::QuestionnaireScreen(int width) : _header_width(width) {}
+QuestionnaireScreen::QuestionnaireScreen(int width) : _header_width(width), _pression_hydrolique(0.0), _pression_broche_air(0.0), _temperature_bloc_froid(0.0) {}
 
 QuestionnaireScreen::~QuestionnaireScreen() { save_settings(); }
 
