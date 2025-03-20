@@ -134,22 +134,53 @@ void QuestionnaireScreen::prepare_questionnaire(ScreenInteractive &screen) {
   });
 }
 
+void QuestionnaireScreen::load_settings(std::string filename) {
+  _settings_filename = filename;
+  std::ifstream file(filename);
+  if (file.is_open()) {
+    file >> _settings;
+    file.close();
+  }
+  _nom = _settings.value("nom", "");
+  _groupe = _setting.value("groupe","");
+  _date = _settings.value("date", "");
+  _pression_hydrolique_str = _settings.value("pression hydrolique", "0");
+  _pression_broche_air_str = _settings.value("pression broche air", "0");
+  _temperature_bloc_froid_str = _settings.value("temperature bloc froid", "0");
+  _observation = _settings.value("observation", "");
+}
+
+void QuestionnaireScreen::save_settings() {
+  update_settings();
+  std::ofstream file(_settings_filename);
+  if (file.is_open()) {
+    file << _settings.dump(2);
+    file.close();
+  }
+}
+
+void QuestionnaireScreen::update_settings() {
+  _settings = {
+      {"nom", _nom},
+      {"groupe", _groupe},
+      {"date", _date},
+      {"zone_index", _zone_index},
+      {"machine_index", _machine_index},
+      {"pression_hydrolique", _pression_hydrolique_str},
+      {"pression_broche_air", _pression_broche_air_str},
+      {"temperature_bloc_froid", _temperature_bloc_froid_str},
+      {"huile_broche_index", _huile_broche_index},
+      {"huile_glissieres_index", _huile_glissieres_index},
+      {"lubrifiant_index", _lubrifiant_index},
+      {"bac_copeaux_index", _bac_copeaux_index},
+      {"proprete_usinage_index", _proprete_usinage_index},
+      {"proprete_machine_index", _proprete_machine_index},
+      {"observation", _observation}
+  };
+}
+
 json QuestionnaireScreen::get_data() {
-  json data;
-  data["Nom"] = _nom;
-  data["Groupe"] = _groupe;
-  data["Date"] = _date;
-  data["Zone"] = _zones[_zone_index];
-  data["Machine"] = _machines[_machine_index];
-  data["Pression Hydrolique"] = _pression_hydrolique;
-  data["Pression Broche Air"] = _pression_broche_air;
-  data["Température Bloc Froid"] = _temperature_bloc_froid;
-  data["Niveau Huile Broche"] = _niveau_options[_huile_broche_index];
-  data["Niveau Huile Glissieres"] = _niveau_options[_huile_glissieres_index];
-  data["Niveau Lubrifiant"] = _niveau_options[_lubrifiant_index];
-  data["Niveau Bac Copeaux"] = _niveau_options[_bac_copeaux_index];
-  data["Propreté Zone Usinage"] = _proprete_options[_proprete_usinage_index];
-  data["Propreté Machine"] = _proprete_options[_proprete_machine_index];
-  data["Observation"] = _observation;
-  return data;
+  update_settings();
+  _data["info"] = _settings;
+  return _data;
 }
