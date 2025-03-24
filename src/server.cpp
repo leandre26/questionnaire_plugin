@@ -1,5 +1,5 @@
 #include <crow.h>
-#include "src/questionnaire_screen.hpp"
+#include "questionnaire_screen.hpp"
 
 int main() {
     crow::SimpleApp app;
