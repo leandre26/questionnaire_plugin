@@ -120,6 +120,7 @@ include_directories(${CMAKE_SOURCE_DIR}/include/crow)
 include_directories(${CMAKE_SOURCE_DIR}/include/crow/include)
 include_directories(${CMAKE_SOURCE_DIR}/include/crow/include/crow)
 include_directories(${CMAKE_SOURCE_DIR}/include/crow/include/crow/middlewares)
+include_directories(/usr/include/asio)
 add_executable(server src/server.cpp)
 target_include_directories(server PRIVATE include)
 target_link_libraries(server PRIVATE questionnaire_lib)  # Link your questionnaire plugin
