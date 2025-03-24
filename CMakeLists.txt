@@ -125,8 +125,6 @@ set_target_properties(questionnaire_lib PROPERTIES
 
 target_link_libraries(questionnaire_lib PRIVATE ftxui::screen ftxui::component)
 
-# Ensure server can link against questionnaire_lib
-target_link_libraries(server PRIVATE questionnaire_lib)
 
 # Example executable
 add_executable(example ${SRC_DIR}/example.cpp ${SRC_DIR}/questionnaire_screen.cpp)
