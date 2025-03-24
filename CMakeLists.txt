@@ -111,6 +111,23 @@ add_plugin(questionnaire
   LIBS ftxui::screen ftxui::component
 )
 
+# Define the Questionnaire Plugin as a Static Library
+add_library(questionnaire_lib STATIC
+  ${SRC_DIR}/questionnaire_screen.cpp
+)
+
+# Ensure CMake places the library in the correct folder
+set_target_properties(questionnaire_lib PROPERTIES
+  OUTPUT_NAME "questionnaire_lib"
+  ARCHIVE_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/lib"
+  LIBRARY_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/lib"
+)
+
+target_link_libraries(questionnaire_lib PRIVATE ftxui::screen ftxui::component)
+
+# Ensure server can link against questionnaire_lib
+target_link_libraries(server PRIVATE questionnaire_lib)
+
 # Example executable
 add_executable(example ${SRC_DIR}/example.cpp ${SRC_DIR}/questionnaire_screen.cpp)
 target_link_libraries(example PRIVATE ftxui::screen ftxui::dom ftxui::component)
@@ -121,6 +138,7 @@ include_directories(${CMAKE_SOURCE_DIR}/include/crow/include)
 include_directories(${CMAKE_SOURCE_DIR}/include/crow/include/crow)
 include_directories(${CMAKE_SOURCE_DIR}/include/crow/include/crow/middlewares)
 include_directories(/usr/include/asio)
+
 add_executable(server src/server.cpp)
 target_include_directories(server PRIVATE include)
 target_link_libraries(server PRIVATE questionnaire_lib)  # Link your questionnaire plugin
