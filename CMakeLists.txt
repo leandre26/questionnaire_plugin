@@ -116,9 +116,10 @@ add_executable(example ${SRC_DIR}/example.cpp ${SRC_DIR}/questionnaire_screen.cp
 target_link_libraries(example PRIVATE ftxui::screen ftxui::dom ftxui::component)
 
 # Server exectuable
-include_directories(${CMAKE_SOURCE_DIR}/include)
-include_directories(${CMAKE_SOURCE_DIR}/include/include)
-include_directories(${CMAKE_SOURCE_DIR}/include/include/crow)
+include_directories(${CMAKE_SOURCE_DIR}/include/crow)
+include_directories(${CMAKE_SOURCE_DIR}/include/crow/include)
+include_directories(${CMAKE_SOURCE_DIR}/include/crow/include/crow)
+include_directories(${CMAKE_SOURCE_DIR}/include/crow/include/crow/middlewares)
 add_executable(server src/server.cpp)
 target_include_directories(server PRIVATE include)
 target_link_libraries(server PRIVATE questionnaire_lib)  # Link your questionnaire plugin
