@@ -8,10 +8,18 @@ RUN apt-get update && apt-get install -y \
     make \
     git \
     libboost-all-dev \
-    libasio-dev
+    libasio-dev \
+    libssl-dev \
+    wget
 
 # Set the working directory inside the container
 WORKDIR /app
+
+# Download and install Crow (header-only library)
+RUN git clone --branch master --depth 1 https://github.com/CrowCpp/Crow.git /tmp/crow \
+    && mkdir -p /usr/local/include/crow \
+    && cp -r /tmp/crow/include/crow /usr/local/include/ \
+    && rm -rf /tmp/crow
 
 # Copy the source code into the container
 COPY . .
