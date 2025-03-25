@@ -47,5 +47,5 @@ int main() {
         return "Thank you, " + name + "! Your response has been recorded.";
     });
 
-    app.port(5000).multithreaded().run();
+    app.bindaddr("0.0.0.0").port(5000).multithreaded().run();
 }
