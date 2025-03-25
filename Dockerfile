@@ -15,7 +15,7 @@ RUN apt-get update && apt-get install -y \
 # Set the working directory inside the container
 WORKDIR /app
 
-# Download and install Crow (header-only library)
+# Download and install Crow
 RUN git clone --branch master --depth 1 https://github.com/CrowCpp/Crow.git /tmp/crow \
     && mkdir -p /usr/local/include/crow \
     && cp -r /tmp/crow/include/crow /usr/local/include/ \
@@ -23,6 +23,9 @@ RUN git clone --branch master --depth 1 https://github.com/CrowCpp/Crow.git /tmp
 
 # Copy the source code into the container
 COPY . .
+
+# Ensure Crow is found by CMake
+ENV CPLUS_INCLUDE_PATH="/usr/local/include/crow:$CPLUS_INCLUDE_PATH"
 
 # Build the application
 RUN cmake -B build && cmake --build build
