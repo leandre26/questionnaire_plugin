@@ -1,0 +1,6 @@
+[build]
+builder = "nixpacks"
+buildCommand = "cmake -B build && cmake --build build"
+
+[start]
+cmd = "./build/server"
