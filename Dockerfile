@@ -22,7 +22,7 @@ COPY . .
 ENV CPLUS_INCLUDE_PATH="/app/include:/app/include/crow:$CPLUS_INCLUDE_PATH"
 
 # Run CMake with explicit include directory
-RUN cmake -B build -DCMAKE_INCLUDE_PATH="/app/include:/app/include/crow" && cmake --build build
+RUN cmake -B build && cmake --build build
 
 # Expose the port your server is running on
 EXPOSE 5000
